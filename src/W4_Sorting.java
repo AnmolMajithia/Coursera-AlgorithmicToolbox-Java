@@ -5,13 +5,23 @@ public class W4_Sorting {
     private static Random random = new Random();
 
     private static int[] partition3(int[] a, int l, int r) {
-      //write your code here
-
-
-      int m1 = l;
-      int m2 = r;
-      int[] m = {m1, m2};
-      return m;
+        int x = a[l];
+        for(int i = l+1; i <= r; i++) {
+            if(a[i] < x) {
+                int temp = a[i];
+                a[i] = a[l];
+                a[l] = temp;
+                l++;
+            }
+            else if(a[i] > x) {
+                int temp = a[i];
+                a[i] = a[r];
+                a[r] = temp;
+                r--;
+                i--;
+            }
+        }
+        return new int[]{l, r};
     }
 
     private static int partition2(int[] a, int l, int r) {
@@ -40,9 +50,10 @@ public class W4_Sorting {
         a[l] = a[k];
         a[k] = t;
         //use partition3
-        int m = partition2(a, l, r);
-        randomizedQuickSort(a, l, m - 1);
-        randomizedQuickSort(a, m + 1, r);
+        //int m = partition2(a, l, r);
+        int[] m = partition3(a, l, r);
+        randomizedQuickSort(a, l, m[0]-1);
+        randomizedQuickSort(a, m[1]+1, r);
     }
 
     public static void main(String[] args) {
