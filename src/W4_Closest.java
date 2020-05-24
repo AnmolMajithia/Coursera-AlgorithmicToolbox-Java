@@ -6,10 +6,61 @@ import java.util.*;
 public class W4_Closest {
     private static Random random = new Random();
 
-    static class Point implements Comparable<Point> {
-        long x, y;
+    private static int[] partition3(Point[] a, int l, int r, boolean xsort) {
+        if (xsort) {
+            int x = a[l].x;
+            for (int i = l + 1; i <= r; i++) {
+                if (a[i].x < x) {
+                    Point temp = a[i];
+                    a[i] = a[l];
+                    a[l] = temp;
+                    l++;
+                } else if (a[i].x > x) {
+                    Point temp = a[i];
+                    a[i] = a[r];
+                    a[r] = temp;
+                    r--;
+                    i--;
+                }
+            }
+        }
+        else {
+            int y = a[l].y;
+            for (int i = l + 1; i <= r; i++) {
+                if (a[i].y < y) {
+                    Point temp = a[i];
+                    a[i] = a[l];
+                    a[l] = temp;
+                    l++;
+                } else if (a[i].y > y) {
+                    Point temp = a[i];
+                    a[i] = a[r];
+                    a[r] = temp;
+                    r--;
+                    i--;
+                }
+            }
+        }
+        return new int[]{l, r};
+    }
 
-        public Point(long x, long y) {
+    private static void randomizedQuickSort(Point[] a, int l, int r, boolean x) {
+        if (l >= r) {
+            return;
+        }
+        int k = random.nextInt(r - l + 1) + l;
+        Point t = a[l];
+        a[l] = a[k];
+        a[k] = t;
+        int[] m = partition3(a, l, r, x);
+        randomizedQuickSort(a, l, m[0]-1, x);
+        randomizedQuickSort(a, m[1]+1, r, x);
+    }
+
+    static class Point implements Comparable<Point> {
+        int x, y;
+
+        public Point(int x, int y) {
             this.x = x;
             this.y = y;
         }
@@ -22,14 +73,6 @@ public class W4_Closest {
 
     static double distance(Point p1, Point p2) {
         return Math.sqrt(Math.pow((p1.x - p2.x), 2) + Math.pow((p1.y - p2.y), 2));
-    }
-
-    static Point[] constructPoints(int[] x, int[] y) {
-        Point[] points = new Point[x.length];
-        for (int i = 0; i < x.length; i++) {
-            points[i] = new Point(x[i], y[i]);
-        }
-        return points;
     }
 
     static double brute(Point[] points, int lo, int hi) {
@@ -46,8 +89,8 @@ public class W4_Closest {
     }
 
     static double centerMin(Point[] points, double gap, double midLine) {
-        int l = 0, r = 0;
         int mid = points.length/2;
+        int l = mid, r = mid;
         for(int i = 0; i <= mid; i++) {
             if(Math.abs(points[i].x - midLine) <= gap) {
                 l = i;
@@ -76,23 +119,21 @@ public class W4_Closest {
         return Math.min(partitionMin, centerRegionMin);
     }
 
-    static double minimalDistance(int[] x, int[] y) {
-        Point[] points = constructPoints(x,y);
-        Arrays.sort(points);
-        return divConq(points, 0, x.length - 1);
+    static double minimalDistance(Point[] points) {
+        //Arrays.sort(points);
+        randomizedQuickSort(points, 0, points.length - 1, true);
+        return divConq(points, 0, points.length - 1);
     }
 
     public static void main(String[] args) {
         reader = new BufferedReader(new InputStreamReader(System.in));
         writer = new PrintWriter(System.out);
         int n = nextInt();
-        int[] x = new int[n];
-        int[] y = new int[n];
+        Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
-            x[i] = nextInt();
-            y[i] = nextInt();
+            points[i] = new Point(nextInt(), nextInt());
         }
-        System.out.println(minimalDistance(x, y));
+        System.out.println(minimalDistance(points));
         writer.close();
     }
 
